@@ -329,13 +329,13 @@ function HomePage() {
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <Upload className="w-8 h-8 text-green-600" />
               </div>
-              <CardTitle className="text-xl">Upload Image</CardTitle>
+              <CardTitle className="text-xl ">Upload Image</CardTitle>
               <CardDescription>
                 Upload an image to run a object detection analysis
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline" size="lg">
+              <Button className="w-full text-white" variant="outline" size="lg">
                 Choose Image
               </Button>
               <input
