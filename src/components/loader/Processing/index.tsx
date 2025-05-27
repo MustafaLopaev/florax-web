@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { HashLoader } from 'react-spinners';
+import { HashLoader, PacmanLoader } from 'react-spinners';
 import './index.css';
 interface ProcessingLoadingInterface {
   text?: string;
@@ -37,7 +37,7 @@ const ProcessinLoading = ({
           className=" flex w-full flex-col items-center
          justify-center gap-2"
         >
-          <HashLoader size={80} speedMultiplier={1} color={'#8C72F3'} />
+          <PacmanLoader size={40} speedMultiplier={1} color={'#8C72F3'} />
           <h3>{text}</h3>
         </div>
       </div>
