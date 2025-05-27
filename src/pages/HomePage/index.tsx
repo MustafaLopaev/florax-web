@@ -21,10 +21,7 @@ import {
 const PUBLISHABLE_KEY = 'rf_wfMlQ8YUt1Qc6FVWqoP52p3mdu52';
 const MODEL_NAME = 'florax-ai';
 const MODEL_VERSION = 4;
-const configuration = {
-  scoreThreshold: 0.2, // minimum confidence
-  iouThreshold: 0.5, // NMS overlap threshold
-};
+
 type DetectionMode = 'camera' | 'upload' | 'select';
 
 interface Prediction {
