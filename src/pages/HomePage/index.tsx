@@ -280,7 +280,7 @@ function HomePage() {
 
   if (mode === 'select') {
     return (
-      <div className=" w-full h-full bg-gradient-to-br bg-white p-4">
+      <div className=" w-full h-full bg-gradient-to-br from-gray-500 to-indigo-700 p-4">
         <div className="text-center mb-8 pt-8">
           <div className="flex flex-row gap-2 items-center justify-center mb-4">
             <img src="/logo.svg" alt="Florax AI Logo" className="w-12 h-12" />
@@ -351,7 +351,7 @@ function HomePage() {
   }
 
   return (
-    <div className="w-full h-full bg-gradient-to-br bg-white  p-4">
+    <div className="w-full h-full bg-gradient-to-br from-gray-500 to-indigo-700  p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
