@@ -280,11 +280,12 @@ function HomePage() {
 
   if (mode === 'select') {
     return (
-      <div className=" w-full h-full bg-gradient-to-br from-gray-500 to-indigo-700 p-4">
+      <div className=" w-full h-full bg-gradient-to-br bg-white p-4">
         <div className="text-center mb-8 pt-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            AI Object Detection
-          </h1>
+          <div className="flex flex-row gap-2 items-center justify-center mb-4">
+            <img src="/logo.svg" alt="Florax AI Logo" className="w-12 h-12" />
+            <h1 className="text-4xl font-bold text-white-900 mb-4">Florax AI</h1>
+          </div>
           <p className="text-xl text-black">
             Choose how you want to detect objects
           </p>
@@ -350,7 +351,7 @@ function HomePage() {
   }
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-gray-500 to-indigo-700  p-4">
+    <div className="w-full h-full bg-gradient-to-br bg-white  p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
