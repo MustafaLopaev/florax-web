@@ -33,7 +33,8 @@ const MODEL_VERSION = 4;
 // Hardcoded price dictionary for different object classes
 const PRICE_DICTIONARY: Record<string, number> = {
   // Add more items as needed
-  unknown: 1.0, // Default price for unrecognized items
+  rose: 1900,
+  unknown: 1200, // Default price for unrecognized items
 };
 
 type DetectionMode = 'camera' | 'upload' | 'select';
@@ -339,7 +340,7 @@ function HomePage() {
       ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
   };
-
+  console.log(predictions);
   if (isLoading) {
     return <ProcessinLoading text={loadingMessage} isLoading={true} />;
   }
@@ -512,10 +513,10 @@ function HomePage() {
 
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-gray-600">
-                            ${group.unitPrice.toFixed(2)} each
+                            kzt {group.unitPrice.toFixed(2)} each
                           </span>
                           <span className="font-semibold text-green-600">
-                            ${group.totalPrice.toFixed(2)}
+                            kzt {group.totalPrice.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -530,7 +531,7 @@ function HomePage() {
                               Total ({totalItems} items)
                             </span>
                             <span className="font-bold text-xl text-green-600">
-                              ${totalPrice.toFixed(2)}
+                              kzt {totalPrice.toFixed(2)}
                             </span>
                           </div>
                         </div>
