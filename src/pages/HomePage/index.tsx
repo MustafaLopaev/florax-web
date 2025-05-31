@@ -3,7 +3,13 @@
 import type React from 'react';
 
 import { CVImage, InferenceEngine } from 'inferencejs';
-import { AlertCircle, Camera, RotateCcw, Upload } from 'lucide-react';
+import {
+  AlertCircle,
+  Camera,
+  RotateCcw,
+  Upload,
+  ShoppingCart,
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import ProcessinLoading from '@/components/loader/Processing';
@@ -16,11 +22,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 // Environment variable for your Roboflow publishable key
 const PUBLISHABLE_KEY = 'rf_wfMlQ8YUt1Qc6FVWqoP52p3mdu52';
 const MODEL_NAME = 'florax-ai';
 const MODEL_VERSION = 4;
+
+// Hardcoded price dictionary for different object classes
+const PRICE_DICTIONARY: Record<string, number> = {
+  // Add more items as needed
+  unknown: 1.0, // Default price for unrecognized items
+};
 
 type DetectionMode = 'camera' | 'upload' | 'select';
 
@@ -33,6 +47,15 @@ interface Prediction {
     width: number;
     height: number;
   };
+  color: string;
+}
+
+interface GroupedPrediction {
+  class: string;
+  count: number;
+  averageConfidence: number;
+  unitPrice: number;
+  totalPrice: number;
   color: string;
 }
 
@@ -58,6 +81,49 @@ function HomePage() {
   const setIsDetecting = (status: boolean) => {
     isDetecting.current = status;
   };
+
+  // Group predictions by class and calculate pricing
+  const groupedPredictions = useMemo((): GroupedPrediction[] => {
+    const groups: Record<string, Prediction[]> = {};
+
+    // Group predictions by class
+    predictions.forEach((prediction) => {
+      if (!groups[prediction.class]) {
+        groups[prediction.class] = [];
+      }
+      groups[prediction.class].push(prediction);
+    });
+
+    // Convert to grouped predictions with pricing
+    return Object.entries(groups).map(([className, classPredictions]) => {
+      const count = classPredictions.length;
+      const averageConfidence =
+        classPredictions.reduce((sum, p) => sum + p.confidence, 0) / count;
+      const unitPrice =
+        PRICE_DICTIONARY[className.toLowerCase()] ||
+        PRICE_DICTIONARY['unknown'];
+      const totalPrice = unitPrice * count;
+
+      return {
+        class: className,
+        count,
+        averageConfidence,
+        unitPrice,
+        totalPrice,
+        color: classPredictions[0].color,
+      };
+    });
+  }, [predictions]);
+
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    return groupedPredictions.reduce((sum, group) => sum + group.totalPrice, 0);
+  }, [groupedPredictions]);
+
+  // Calculate total items
+  const totalItems = useMemo(() => {
+    return groupedPredictions.reduce((sum, group) => sum + group.count, 0);
+  }, [groupedPredictions]);
 
   useEffect(() => {
     if (!modelLoading && !modelWorkerId) {
@@ -280,11 +346,11 @@ function HomePage() {
 
   if (mode === 'select') {
     return (
-      <div className=" w-full h-full bg-gradient-to-br from-gray-500 to-indigo-700 p-4">
+      <div className=" w-full h-full bg-white from-gray-500 to-indigo-700 p-4">
         <div className="text-center mb-8 pt-8">
           <div className="flex flex-row gap-2 items-center justify-center mb-4">
-            <img src="/logo.svg" alt="Florax AI Logo" className="w-12 h-12" />
-            <h1 className="text-4xl font-bold text-white-900 mb-4">Florax AI</h1>
+            <img src="/logo.svg" alt="Florax AI Logo" className="h-24" />
+            {/* <h1 className="text-4xl font-bold text-white-900 mb-4">Florax AI</h1> */}
           </div>
           <p className="text-xl text-black">
             Choose how you want to detect objects
@@ -333,9 +399,10 @@ function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full text-white" variant="outline" size="lg">
+              <Button className="w-full" size="lg">
                 Choose Image
               </Button>
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -357,7 +424,11 @@ function HomePage() {
           <h1 className="text-3xl font-bold text-gray-900">
             {mode === 'camera' ? 'Live Camera Detection' : 'Image Analysis'}
           </h1>
-          <Button onClick={resetToSelection} variant="outline">
+          <Button
+            onClick={resetToSelection}
+            variant="outline"
+            className="text-white"
+          >
             <RotateCcw className="w-4 h-4 mr-2" />
             Back to Selection
           </Button>
@@ -399,44 +470,78 @@ function HomePage() {
           </div>
 
           <div className="space-y-4">
+            {/* Detection Results */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Detection Results</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  Detection Results
+                </CardTitle>
                 <CardDescription>
-                  {predictions.length} object(s) detected
+                  {totalItems} item(s) detected in {groupedPredictions.length}{' '}
+                  categories
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col overflow-hidden">
-                {predictions.length === 0 ? (
+                {groupedPredictions.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">
                     No objects detected yet
                   </p>
                 ) : (
-                  <div className="space-y-2 flex-1 overflow-y-auto max-h-96">
-                    {predictions.map((prediction, index) => (
+                  <div className="space-y-3 flex-1 overflow-y-auto max-h-96">
+                    {groupedPredictions.map((group, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        className="p-4 bg-gray-50 rounded-lg border"
                       >
-                        <div className="flex items-center space-x-3">
-                          <div
-                            className="w-4 h-4 rounded"
-                            style={{ backgroundColor: prediction.color }}
-                          />
-                          <span className="font-medium text-gray-800">
-                            {prediction.class}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="w-4 h-4 rounded"
+                              style={{ backgroundColor: group.color }}
+                            />
+                            <span className="font-semibold text-gray-800 capitalize">
+                              {group.class}
+                            </span>
+                            <Badge variant="secondary">{group.count}x</Badge>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {Math.round(group.averageConfidence * 100)}% avg
                           </span>
                         </div>
-                        <span className="text-sm text-gray-600">
-                          {Math.round(prediction.confidence * 100)}%
-                        </span>
+
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            ${group.unitPrice.toFixed(2)} each
+                          </span>
+                          <span className="font-semibold text-green-600">
+                            ${group.totalPrice.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     ))}
+
+                    {groupedPredictions.length > 0 && (
+                      <>
+                        <Separator />
+                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-lg text-gray-800">
+                              Total ({totalItems} items)
+                            </span>
+                            <span className="font-bold text-xl text-green-600">
+                              ${totalPrice.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
 
+            {/* Camera Controls */}
             {mode === 'camera' && (
               <Card>
                 <CardHeader>
@@ -452,6 +557,25 @@ function HomePage() {
                       ? 'Pause Detection'
                       : 'Resume Detection'}
                   </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Price Dictionary Info */}
+            {groupedPredictions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Pricing Info</CardTitle>
+                  <CardDescription>
+                    Prices are based on our product catalog
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>• Prices shown are per unit</p>
+                    <p>• Unknown items default to $1.00</p>
+                    <p>• Confidence shows detection accuracy</p>
+                  </div>
                 </CardContent>
               </Card>
             )}
