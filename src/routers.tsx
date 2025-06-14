@@ -15,6 +15,13 @@ const LoaderWrapper =
     );
   };
 
+const LoadModelLocalPage = LoaderWrapper(
+  lazy(() => import('./pages/LoadModelLocal'))
+);
+const CloudDetectionPage = LoaderWrapper(
+  lazy(() => import('./pages/CloudDetection'))
+);
+
 const HomePage = LoaderWrapper(lazy(() => import('./pages/HomePage')));
 
 // The router configuration array
@@ -25,8 +32,16 @@ const router = createBrowserRouter([
     // errorElement: <ErrorPage />, // Fallback for route errors
     children: [
       {
-        index: true,
+        path: '',
         element: <HomePage />,
+      },
+      {
+        path: 'load-model-local',
+        element: <LoadModelLocalPage />,
+      },
+      {
+        path: 'cloud-detection',
+        element: <CloudDetectionPage />,
       },
     ],
   },
